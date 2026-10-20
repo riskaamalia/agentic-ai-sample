@@ -1,13 +1,14 @@
 # Roadmap Vertical Slice
 
-## Tahap 0 — Scope dan data (selesai sebagai dokumen; implementasi belum dimulai)
+## Tahap 0 — Scope dan data (rancangan selesai)
 
 - Menetapkan satu jenis TKD: DBH SDA Perikanan TA 2024.
 - Menemukan sumber SIKD nasional dan daerah contoh Kota Bandung, Sumedang, Bandung Barat.
 - Menandai data tingkat Provinsi Jawa Barat perlu ekstraksi/rekonsiliasi, tidak mengganti dengan nol.
 - Menulis prinsip traceability, presisi, dan batas risiko.
+- Membuat fixture JSON awal dengan sumber, snapshot, status, dan presisi.
 
-## Tahap 1 — Fixture data dan provenance
+## Tahap 1 — Fixture data dan provenance (draft dibuat, rekonsiliasi belum selesai)
 
 - Salin fixture kecil dari sumber resmi dengan nominal presisi yang tersedia.
 - Simpan angka tampilan, unit, snapshot date, retrieval date, URL dan status.
@@ -16,7 +17,7 @@
 
 **Gate:** sumber + transkripsi direview sebelum rule/threshold ditambahkan.
 
-## Tahap 2 — Engine deterministik
+## Tahap 2 — Engine deterministik (implementasi awal ada, verifikasi perlu dilanjutkan)
 
 - Implementasikan validasi dan metrik pagu, realisasi, rasio, gap, delta skenario.
 - Implementasikan perlakuan missing/zero/rounded/over-budget dan pembulatan.
@@ -24,11 +25,13 @@
 
 **Gate:** acceptance hitung tangan cocok; setiap mismatch dicatat.
 
-## Tahap 3 — UI dan skenario
+## Tahap 3 — UI dan skenario (prototype awal ada, belum dijalankan di browser)
 
 - Buat Streamlit form untuk memilih observation dan memasukkan asumsi alternatif.
 - Tampilkan hasil, bukti, source/version, keterbatasan, dan baseline vs skenario.
 - Uji alur end-to-end internal sesuai prosedur proyek.
+
+UI ada di `src/app.py`; pemeriksaan hitung/sintaks belum membuktikan runtime Streamlit. Jalankan pada environment dengan dependency terpasang sebelum mengklaim runnable.
 
 ## Tahap 4 — Quality gate ML/BA
 

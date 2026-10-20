@@ -6,6 +6,10 @@ Bangun vertical slice prototype Early Warning System dan Decision Support System
 
 Prototype adalah alat eksplorasi/pemantauan, bukan sistem penetapan alokasi, audit, prediksi, atau keputusan penyaluran resmi.
 
+## Status implementasi
+
+Per 20 Oktober 2026, UI/engine/fixture v0 telah ditulis di `src/`. Pemeriksaan aritmetika dan sintaks dasar dapat dijalankan, tetapi Streamlit belum tersedia di environment saat ini sehingga UI belum dibuka di browser. Review ML/BA dan rekonsiliasi nominal masih pending. Checkbox DoD di bawah tetap belum dicentang sampai bukti runtime dan review tersedia.
+
 ## Tujuan
 
 Membuktikan bahwa pengguna dapat memilih/memasukkan data DBH Perikanan, melihat perhitungan yang dapat diulang, membandingkan perubahan asumsi, dan menelusuri sumber serta batasan setiap hasil.

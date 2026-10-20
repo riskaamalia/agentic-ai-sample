@@ -34,7 +34,7 @@ src/
   ui/                        # komponen tampilan bila app.py membesar
 ```
 
-Penulisan kode belum dilakukan pada tahap dokumen ini. Struktur di atas adalah kontrak implementasi awal; setiap modul harus dijelaskan sebelum ditambahkan.
+UI prototype v0 sekarang berada di `src/app.py`, perhitungan murni di `src/engine/calculations.py`, dan fixture/provenance di `src/data/observations.json`. UI belum bisa dijalankan di lingkungan kerja saat ini karena Streamlit belum terpasang; `requirements.txt` mendeklarasikan dependensinya. Struktur lanjutan tetap ditambahkan bertahap setelah slice ini direview.
 
 ### Alur data
 

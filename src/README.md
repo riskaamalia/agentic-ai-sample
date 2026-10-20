@@ -1,22 +1,24 @@
-# Source Code Area
+# UI Prototype
 
-Status: **belum ada kode aplikasi**. Folder ini saat ini hanya menyimpan dokumen kontrak awal agar implementasi tetap bertahap dan mudah direview.
+Vertical slice awal untuk membandingkan baseline dan simulasi DBH SDA Perikanan TA 2024.
 
-## Rencana modul pertama
+## Menjalankan
 
-```text
-src/
-  app.py                    # entry point Streamlit
-  engine/
-    calculations.py         # rasio, gap, delta scenario; pure functions
-    validation.py           # validasi nilai/status/provenance
-  data/
-    observations.csv        # fixture DBH Perikanan berversi
-    loader.py               # parsing tanpa kehilangan metadata
-  ui/
-    components.py           # tampilan hasil/source/scenario bila dibutuhkan
+Dari direktori root repository:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+streamlit run src/app.py
 ```
 
-Mulai dengan fixture dan engine saja. Tambahkan satu tahap pada satu waktu. Jangan buat folder/file Python di sini sebelum definisi dan ruang lingkup tahap implementasinya siap direview.
+## Isi
 
-Kontrak desain ada di `../docs/architecture.md`, `../docs/data-model.md`, dan `../docs/risk-methodology.md`.
+- `app.py` — UI Streamlit untuk memilih wilayah, melihat data dasar, mengubah input skenario, dan membandingkan rasio/gap.
+- `data/observations.json` — fixture kecil dengan URL sumber, snapshot, status ketersediaan, dan presisi.
+- `engine/calculations.py` — fungsi hitung Decimal deterministik, tanpa ketergantungan pada UI.
+
+Data contoh SIKD ditampilkan dalam miliar rupiah dan dibulatkan dua desimal. UI menyebut hasil sebagai angka tampilan; jangan menganggapnya nilai rupiah exact. Provinsi Jawa Barat muncul sebagai `not_verified`, bukan nol, dan input skenarionya dinonaktifkan sampai diverifikasi.
+
+Sinyal UI bersifat advisory. Snapshot tahunan tidak cukup untuk menilai keterlambatan penyaluran. Seluruh skenario alternatif diberi label simulasi dan tidak menimpa data sumber.
