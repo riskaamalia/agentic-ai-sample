@@ -1,29 +1,30 @@
 # EWS DBH SDA Perikanan
 
-Rancangan vertical slice untuk prototype Early Warning System (EWS) dan Decision Support System (DSS) DBH SDA Perikanan. Fokus awal: TA 2024, data publik DJPK/SIKD, engine deterministik, UI Streamlit, dan perbandingan baseline dengan asumsi skenario.
+Rancangan vertical slice DBH SDA Perikanan TA 2026 sebagai use case Early Warning System (EWS) dan Decision Support System (DSS). Baseline awal memakai observasi nasional berjalan dari SIKD; cakupan agregat `Se-Prov` diperluas setelah data tahun 2026 per wilayah berhasil diverifikasi. Target simulator alokasi mencakup input data/parameter, validasi, formula deterministik terverifikasi, estimasi per daerah, scenario comparison, rekonsiliasi pagu, dan jejak hitung.
 
-**Status:** tahap dokumentasi rancangan. Belum ada engine atau UI runnable dan belum ada review ML/BA. Jangan menggunakan dokumen ini sebagai klaim bahwa Definition of Done card sudah terpenuhi.
+**Status:** form input Streamlit awal tersedia di `src/app.py`; engine alokasi dan alur runnable end-to-end belum tersedia, dependensi belum terpasang, dan review ML/BA belum dilakukan. Definition of Done card belum terpenuhi.
 
 ## Mulai membaca
 
 1. [`docs/clickup-card.md`](docs/clickup-card.md) — scope, DoD, acceptance criteria, evidence.
 2. [`docs/research.md`](docs/research.md) — data contoh, sumber, kualitas dan pertanyaan verifikasi.
-3. [`docs/architecture.md`](docs/architecture.md) — desain komponen.
-4. [`docs/data-model.md`](docs/data-model.md) — skema observation, scenario, result, dan review.
-5. [`docs/risk-methodology.md`](docs/risk-methodology.md) — rumus dan batas interpretasi sinyal.
-6. [`docs/agent-workflow.md`](docs/agent-workflow.md) — alur UI dan review manusia.
-7. [`docs/roadmap.md`](docs/roadmap.md) — tahap implementasi.
+3. [`docs/data-requirements.md`](docs/data-requirements.md) — inventaris data publik/internal yang diperlukan diagram.
+4. [`docs/architecture.md`](docs/architecture.md) — desain komponen.
+5. [`docs/data-model.md`](docs/data-model.md) — skema observation, scenario, result, dan review.
+6. [`docs/risk-methodology.md`](docs/risk-methodology.md) — rumus dan batas interpretasi sinyal.
+7. [`docs/agent-workflow.md`](docs/agent-workflow.md) — alur UI dan review manusia.
+8. [`docs/roadmap.md`](docs/roadmap.md) — tahap implementasi.
 
 ## Data demonstrasi awal
 
-Portal Data SIKD DJPK untuk TA 2024 menampilkan DBH SDA Perikanan nasional sebesar pagu Rp951,70 miliar dan realisasi Rp944,29 miliar (99,22%). Contoh wilayah Jawa Barat yang ditampilkan SIKD: Kota Bandung Rp1,07 miliar/Rp1,07 miliar; Kab. Sumedang Rp1,10 miliar/Rp1,10 miliar; Kab. Bandung Barat Rp1,07 miliar/Rp1,07 miliar. Angka daerah dibulatkan di tampilan portal. Nilai tingkat Provinsi Jawa Barat masih perlu diverifikasi; data kosong tidak diartikan nol.
+Snapshot Portal Data SIKD DJPK TA 2026 per 22 Oktober 2026 menampilkan DBH SDA Perikanan nasional dengan pagu Rp225,90 M dan realisasi Rp183,47 M (81,22%). Ini adalah data berjalan dan angka tampilan dibulatkan. Data agregat `Se-Prov` TA2026 belum dimasukkan. Observasi TA2025 tetap disimpan sebagai historis di fixture.
 
 Rincian sumber dan snapshot ada di [`docs/research.md`](docs/research.md). Data portal dapat diperbarui, maka angka di atas adalah contoh sumber, bukan fixture runtime.
 
 ## Arsitektur dan batas
 
-Engine Python menghitung rasio, gap, dan perubahan skenario secara deterministik. UI MVP direncanakan memakai Streamlit. Setiap hasil perlu menampilkan sumber, waktu snapshot, satuan, presisi, formula versi, dan batasannya. Data tahunan tidak digunakan untuk menyimpulkan keterlambatan penyaluran. Formula alokasi Minerba dari materi diagram tidak diterapkan pada Perikanan.
+Dashboard Streamlit membaca fixture lokal dan dapat membandingkan asumsi sederhana; belum ada pengambilan data otomatis atau perhitungan alokasi. Rasio/gap SIKD dapat menjadi demonstrator monitoring, bukan simulator alokasi yang ditargetkan diagram. Aturan operasional TA2026, data input seluruh penerima, dan angka acuan harus diverifikasi sebelum mengeluarkan estimasi alokasi. Formula Minerba tidak diterapkan pada Perikanan.
 
 ## Langkah kerja berikutnya
 
-Tutup verifikasi sumber untuk Provinsi Jawa Barat dan nominal daerah yang presisi, lalu implementasikan fixture data sebagai tahap pertama. Ikuti quality gate dan catat review manusia; jangan menganggap AI sebagai reviewer internal.
+Verifikasi sumber 2026 per wilayah dan snapshot yang konsisten, tutup blocker dasar hukum/formula serta contoh hitung DBH Perikanan, lalu implementasikan engine deterministik dan UI bertahap. Ikuti quality gate dan catat review manusia; jangan menganggap AI sebagai reviewer internal.

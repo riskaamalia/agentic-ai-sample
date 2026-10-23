@@ -1,22 +1,32 @@
 # Source Code Area
 
-Status: **belum ada kode aplikasi**. Folder ini saat ini hanya menyimpan dokumen kontrak awal agar implementasi tetap bertahap dan mudah direview.
+Status: **dashboard Streamlit prototype tersedia**. Dashboard default menampilkan baseline DBH SDA Perikanan TA2026 nasional dan menyediakan observasi TA2025 sebagai historis. Ada sensitivitas skenario sederhana. Data hanya dibaca dari JSON lokal; belum ada API, database, pengambilan otomatis, atau kalkulasi alokasi resmi.
 
-## Rencana modul pertama
+## Struktur saat ini
 
 ```text
 src/
-  app.py                    # entry point Streamlit
-  engine/
-    calculations.py         # rasio, gap, delta scenario; pure functions
-    validation.py           # validasi nilai/status/provenance
+  app.py                    # dashboard, filter, metrik, grafik, skenario demo
   data/
-    observations.csv        # fixture DBH Perikanan berversi
-    loader.py               # parsing tanpa kehilangan metadata
-  ui/
-    components.py           # tampilan hasil/source/scenario bila dibutuhkan
+    observations.json       # fixture kecil dengan sumber dan snapshot
+  engine/
+    calculations.py         # perhitungan murni yang direncanakan
 ```
 
-Mulai dengan fixture dan engine saja. Tambahkan satu tahap pada satu waktu. Jangan buat folder/file Python di sini sebelum definisi dan ruang lingkup tahap implementasinya siap direview.
+## Menjalankan dashboard
 
-Kontrak desain ada di `../docs/architecture.md`, `../docs/data-model.md`, dan `../docs/risk-methodology.md`.
+Dari root repository:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run src/app.py --server.baseUrlPath dashboard
+```
+
+Buka URL yang ditampilkan Streamlit, biasanya http://localhost:8501/dashboard/.
+Jika ingin path tanpa port memakai port 80, perlu reverse proxy atau konfigurasi server lokal.
+
+Fixture TA2026 saat ini baru berisi observasi nasional per 22 Oktober 2026. Fixture TA2025 berisi nasional, Kepri, dan Riau; dua observasi wilayah tersebut merupakan agregat Se-Prov dengan tanggal snapshot berbeda. Jangan mencampur tahun atau menafsirkannya sebagai seluruh 38 provinsi maupun alokasi khusus pemerintah provinsi. Angka tampilan dibulatkan.
+
+Formula alokasi DBH Perikanan belum diimplementasikan. Skenario pada UI hanya sensitivitas asumsi pagu/realisasi untuk demo monitoring, bukan ramalan, hasil alokasi, atau alert resmi.

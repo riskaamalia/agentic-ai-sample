@@ -2,32 +2,40 @@
 
 ## Ringkasan
 
-Bangun vertical slice prototype Early Warning System dan Decision Support System untuk **DBH SDA Perikanan TA 2024**, memakai data publik nasional serta contoh kabupaten/kota di Jawa Barat dan tingkat Provinsi Jawa Barat bila datanya berhasil diverifikasi. Engine bersifat deterministik. UI mendukung input, hasil, dan perbandingan baseline dengan asumsi skenario.
+Bangun vertical slice prototype **pemantauan dan scenario comparison DBH SDA Perikanan TA 2026** sebagai use case EWS/DSS SIKD Cerdas. Baseline awal memakai data nasional berjalan; perluasan ke seluruh provinsi mengikuti verifikasi data wilayah. Ikuti alur input dan parameter → validasi → keluaran keputusan yang dapat dibandingkan dan ditelusuri. SIKD `Se-Prov` berarti agregat se-provinsi, bukan otomatis alokasi kepada pemerintah provinsi.
 
-Prototype adalah alat eksplorasi/pemantauan, bukan sistem penetapan alokasi, audit, prediksi, atau keputusan penyaluran resmi.
+Prototype adalah alat analisis untuk mendukung keputusan; hasilnya bukan penetapan alokasi final, audit, prediksi, atau keputusan penyaluran resmi. UI input awal kini tersedia di `src/app.py`, tetapi engine, hasil alokasi, dan perbandingan keluaran belum tersedia; card belum runnable end-to-end.
 
 ## Tujuan
 
-Membuktikan bahwa pengguna dapat memilih/memasukkan data DBH Perikanan, melihat perhitungan yang dapat diulang, membandingkan perubahan asumsi, dan menelusuri sumber serta batasan setiap hasil.
+Membuktikan satu alur end-to-end yang bisa diperiksa: pengguna memilih atau memasukkan data dan parameter DBH Perikanan, sistem memvalidasi kelengkapan dan provenance, mesin deterministik menjalankan formula yang telah diverifikasi untuk versi/periode terkait, lalu UI menyajikan estimasi per daerah, perbandingan skenario, selisih terhadap pagu/periode acuan, dan jejak perhitungan. Setiap hasil menyertakan sumber, asumsi, versi formula, serta batas interpretasi.
 
 ## Ruang lingkup
 
 - Jenis TKD pertama: DBH SDA Perikanan.
-- Periode data dasar: TA 2024.
-- Cakupan sampel: Nasional, Kota Bandung, Kab. Sumedang, Kab. Bandung Barat, dan Provinsi Jawa Barat ketika observasi tingkat provinsi terverifikasi.
-- Metrik v1: pagu, realisasi, persentase realisasi, sisa pagu, perubahan skenario.
-- UI MVP: Streamlit; engine Python murni; fixture awal CSV/JSON dengan provenance.
-- EWS: sinyal berbasis kualitas data dan rule advisory yang disetujui reviewer.
-- DSS: penjelasan bukti dan dampak skenario; manusia tetap mengambil keputusan.
+- Periode data dasar: TA2026; TA2025 menjadi data historis bila definisi dan basisnya sebanding.
+- Cakupan observasi awal: nasional TA2026. Cakupan target: agregat `Se-Prov` seluruh provinsi setelah snapshot TA2026 tiap wilayah tersedia dan diverifikasi.
+- Cakupan mesin alokasi: tetap memerlukan data penerima pada tingkat kabupaten/kota secara nasional dan aturan lengkap; agregat provinsi saja tidak cukup untuk mereproduksi formula alokasi.
+- Input: penerimaan DBH Perikanan, wilayah penerima/hirarki wilayah, variabel dan bobot yang bersumber dari regulasi, data historis, serta pagu indikatif. Status ketersediaan, satuan, snapshot, dan versi sumber wajib eksplisit.
+- Mesin simulasi: validasi kelengkapan; formula alokasi yang diverifikasi untuk DBH Perikanan; perubahan parameter antar-skenario; rekonsiliasi total hasil terhadap pagu acuan.
+- Output: estimasi per daerah, perbandingan skenario, selisih antarperiode dan terhadap pagu, serta jejak input–formula–hasil untuk review.
+- UI MVP: Streamlit; engine Python deterministik; fixture CSV/JSON berversi dengan provenance.
+- EWS: sinyal awal berfokus pada kualitas/kelengkapan data dan aturan advisory yang direview; jangan menyimpulkan keterlambatan dari data agregat tahunan.
+- DSS: memperlihatkan konsekuensi perubahan asumsi dan bukti pendukung; keputusan tetap pada manusia.
+- Model target dibatasi pada satu jenis TKD agar arsitektur dapat dikembangkan ke jenis TKD lain tanpa mengklaim formula lintas jenis sudah tersedia.
+
+**Batas penting:** formula/bobot DBH Perikanan tidak boleh ditebak atau diambil dari diagram DBH Minerba. Sampai sumber hukum, variabel, bobot, dan basis datanya dikonfirmasi, alokasi per daerah serta rekonsiliasi pagu adalah kebutuhan target yang berstatus blocked; angka pagu/realisasi yang telah tersedia hanya mendukung demonstrasi monitoring/perbandingan, bukan simulasi alokasi.
 
 ## Definition of Done
 
 - [ ] Prototype dapat dijalankan dari instruksi yang disediakan.
-- [ ] Engine deterministik, input UI, output, dan perbandingan skenario tersedia serta dapat diperiksa.
-- [ ] Satu jenis TKD dan alur input–hasil–scenario comparison berjalan end-to-end.
-- [ ] Minimal satu hasil dihitung ulang terhadap angka acuan; selisih karena pembulatan/basis didokumentasikan.
-- [ ] Setiap observasi mempunyai sumber, asumsi, unit, presisi, snapshot, versi, dan batasan yang dapat ditelusuri.
-- [ ] Review internal ML/BA dan tindak lanjut tercatat; blocker demo ditutup atau keputusan pengecualian ditulis.
+- [ ] Input, validasi, engine deterministik, output alokasi, dan perbandingan skenario tersedia serta dapat diperiksa.
+- [ ] DBH SDA Perikanan dan alur data–formula–hasil–scenario comparison berjalan end-to-end.
+- [ ] Total alokasi skenario direkonsiliasi terhadap pagu acuan; selisih atau pembatasan basis didokumentasikan.
+- [ ] Minimal satu skenario dihitung ulang terhadap angka acuan independen; perbedaan dijelaskan.
+- [ ] Setiap data/parameter menyimpan sumber, asumsi, unit, presisi, snapshot, versi regulasi/formula, dan batasan.
+- [ ] Hasil menampilkan estimasi per daerah, perubahan terhadap baseline/pagu, dan jejak hitung.
+- [ ] Review internal ML/BA dan tindak lanjut tercatat; blocker demo ditutup atau pengecualian diputuskan tertulis.
 
 ## Acceptance Criteria
 
@@ -35,25 +43,25 @@ Membuktikan bahwa pengguna dapat memilih/memasukkan data DBH Perikanan, melihat 
 
 Prototype runnable: engine deterministik, input UI, output dan perbandingan skenario tersedia serta dapat diperiksa.
 
-**Bukti yang direncanakan:** instruksi run; screenshot/rekaman UI; output baseline dan skenario; versi fixture.
+**Bukti yang direncanakan:** instruksi run; screenshot/rekaman UI; input tervalidasi; output baseline dan skenario; rekonsiliasi; versi fixture/formula; jejak hitung.
 
 ### AC-02 — Substansi
 
 Minimal satu jenis TKD (DBH SDA Perikanan), alur input–hasil dan perbandingan skenario berjalan end-to-end.
 
-**Bukti yang direncanakan:** demo memilih observasi 2024, mengubah input simulasi, melihat rasio/gap dan delta.
+**Bukti yang direncanakan:** demo memilih data/parameter DBH Perikanan TA2026, menjalankan estimasi alokasi per daerah, mengubah asumsi skenario, lalu melihat delta dan rekonsiliasi pagu. Saat ini baru monitoring nasional TA2026 yang tersedia di fixture. Sebelum formula dan dataset penerima terverifikasi, demonstrasi monitoring belum memenuhi substansi simulasi alokasi.
 
 ### AC-03 — Traceability
 
 Minimal satu skenario menghasilkan angka yang sesuai perhitungan acuan atau perbedaan didokumentasikan.
 
-**Acuan awal:** angka nasional SIKD yang tampil: pagu Rp951,70 miliar, realisasi Rp944,29 miliar. Dari angka tampil, rasio = 99,2216…%, dibulatkan menjadi 99,22%, cocok dengan portal. Karena sumber membulatkan angka, validasi nominal exact tetap diperlukan atau pembatasan presisi harus dicantumkan.
+**Acuan awal yang tersedia:** snapshot SIKD nasional TA2026 per 22 Oktober 2026 menampilkan pagu 225,90 M dan realisasi 183,47 M (81,22%). Hitungan dari angka tampilan menghasilkan gap 42,43 M; ini hanya pemeriksaan monitoring, bukan validasi formula alokasi atau angka final tahunan. AC-03 tetap memerlukan satu skenario yang dicocokkan dengan acuan resmi independen.
 
 ### AC-04 — Quality Gate
 
 ML/BA mereview vertical slice dan blocker demo ditindaklanjuti sebelum pengujian final showcase.
 
-**Status saat dokumen dibuat:** belum direview ML/BA. Tidak ada sign-off yang diasumsikan. Lihat `review-log.md` dan `issue-log.md`.
+**Status saat dokumen diperbarui:** belum direview ML/BA. Tidak ada sign-off yang diasumsikan. Reviewer juga perlu menyetujui interpretasi formula, rekonsiliasi pagu, dan wording EWS/DSS. Lihat `review-log.md` dan `issue-log.md`.
 
 ## Acceptance Evidence
 
@@ -68,11 +76,12 @@ Kumpulkan tautan/artefak prototype, sumber data dan fixture versi, output contoh
 
 ## Keputusan scope dan risiko data
 
-1. Gunakan SIKD sebagai sumber pembanding seragam dan catat snapshot tanggal akses.
+1. Gunakan SIKD sebagai sumber observasi/pembanding seluruh provinsi dan catat tanggal snapshot per halaman; jangan menganggap pagu/realisasi `Se-Prov` sebagai data dasar formula alokasi atau pagu khusus Pemprov.
 2. Sumber SIKD memperlihatkan angka dua desimal dalam miliar; simpan sebagai angka tampilan, jangan mengaku nominal rupiah exact.
-3. Observasi Provinsi Jawa Barat belum diisi sampai nilai tingkat provinsi dan definisinya diverifikasi. Nilai tidak tersedia bukan nol.
-4. Tidak mengimplementasikan formula Minerba dari diagram untuk DBH Perikanan.
+3. Jangan menyamakan agregat `Se-Prov` dengan entitlement pemerintah provinsi. Jika observasi wilayah tidak tersedia, bedakan `NOT_AVAILABLE`, `NOT_VERIFIED`, dan nol yang dilaporkan sumber.
+4. Tidak mengimplementasikan formula Minerba dari diagram untuk DBH Perikanan. Variabel dan bobot harus diverifikasi dari dasar hukum DBH Perikanan yang relevan.
 5. Tidak menampilkan alert keterlambatan karena dataset tahunan bukan deret waktu penyaluran.
+6. Diagram menyebut Cetak Biru SIKD 2025–2029/KEP-65/PK/2025; identitas dan dokumen resminya belum berhasil diverifikasi dari pencarian yang dilakukan. Perlakukan sebagai rujukan dari materi yang diberikan, bukan fakta hukum terkonfirmasi, sampai tautan/dokumen primer diperoleh.
 
 ## Referensi internal
 

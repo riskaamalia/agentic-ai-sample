@@ -2,52 +2,57 @@
 
 ## Ringkasan keputusan
 
-Prototype memakai **DBH SDA Perikanan TA 2024** sebagai vertical slice. Sumber primer yang paling mudah dibandingkan antarwilayah adalah Portal Data SIKD DJPK, yang menampilkan akun, anggaran/pagu, realisasi, persentase, filter tahun, wilayah, dan subwilayah. Untuk versi demo, gunakan satu snapshot yang tanggal pengambilannya dicatat. Tampilan portal membulatkan beberapa angka ke dua desimal dalam satuan miliar rupiah; angka tampilan tidak boleh diperlakukan sebagai nilai rupiah exact.
+Baseline kajian adalah DBH SDA Perikanan **TA 2026**, dengan pemantauan nasional berjalan. Perluasan ke agregat `Se-Prov` TA2026 menunggu verifikasi data tiap wilayah. `Se-Prov` adalah agregat wilayah provinsi beserta kabupaten/kotanya, bukan otomatis entitlement pemerintah provinsi.
 
-Prototype ini memantau dan membandingkan nilai pagu serta realisasi yang dipublikasikan. Prototype **tidak menghitung ulang formula alokasi hukum**. Diagram yang dibahas sebelumnya memuat formula Minerba, sehingga bobot, data dasar, atau aturan Minerba tidak ditransfer ke Perikanan.
+Angka SIKD yang dibaca di halaman publik adalah tampilan yang dapat dibulatkan dan berubah menurut snapshot. Sumber itu belum cukup untuk merekonstruksi formula alokasi. Karena itu angka yang ada mendukung demonstrator EWS/DSS pemantauan, bukan simulasi alokasi hukum. TA2026 masih berjalan; baseline yang telah diverifikasi saat ini hanya observasi nasional, belum seluruh provinsi.
 
-## Dataset awal yang dapat diperiksa
+## Dataset awal yang sudah diperiksa
 
-| Wilayah | Tahun | Pagu | Realisasi | Persentase di sumber | Catatan |
+| Wilayah | Tahun | Pagu | Realisasi | Rasio | Catatan |
 |---|---:|---:|---:|---:|---|
-| Nasional | 2024 | Rp951,70 miliar | Rp944,29 miliar | 99,22% | Snapshot SIKD; ditampilkan sebagai agregat nasional. |
-| Kota Bandung | 2024 | Rp1,07 miliar | Rp1,07 miliar | 100,00% | Snapshot SIKD; angka dua desimal miliar. |
-| Kab. Sumedang | 2024 | Rp1,10 miliar | Rp1,10 miliar | 100,00% | Snapshot SIKD; LKPD audited Sumedang juga memuat nilai rinci, perlu dicocokkan sebelum dijadikan acceptance fixture. |
-| Kab. Bandung Barat | 2024 | Rp1,07 miliar | Rp1,07 miliar | 100,00% | Snapshot SIKD; angka dua desimal miliar. |
-| Provinsi Jawa Barat | 2024 | Belum dimasukkan | Belum dimasukkan | — | PPID Jabar menyediakan LKPD/LRA 2024 audited, tetapi nilai akun Perikanan harus diekstrak dan dicocokkan dengan filter wilayah SIKD. Jangan isi nol saat belum ditemukan. |
+| Nasional | 2026 | Rp225,90 M | Rp183,47 M | 81,22% | Snapshot SIKD 22 Oktober 2026; tahun berjalan, angka tampilan bukan nominal exact. |
+| Nasional | 2025 | Rp714,66 M | Rp714,66 M | 100,00% | Historis; snapshot yang diperiksa 21 Oktober 2026. |
+| Agregat `Se-Prov` Kepulauan Riau | 2025 | Rp25,38 M | Rp25,38 M | 100,00% | Historis; snapshot 17 Oktober 2026; bukan alokasi khusus Pemprov Kepri. |
+| Agregat `Se-Prov` Riau | 2025 | Rp14,79 M | Rp14,79 M | 100,00% | Historis; snapshot 9 Oktober 2026; bukan alokasi khusus Pemprov Riau. |
 
-**Kecocokan awal AC-03:** perhitungan dari angka agregat nasional yang tampil di SIKD adalah `(944,29 / 951,70) × 100 = 99,2216…%`, dibulatkan dua desimal menjadi **99,22%**, sama dengan tampilan sumber. Bukti ini cocok untuk memeriksa aturan pembulatan terhadap angka tampilan, tetapi belum membuktikan perhitungan dari nominal rupiah tanpa pembulatan. Untuk acceptance final, ambil nominal dasar yang lebih presisi atau dokumentasikan keterbatasan presisinya.
+**Pemeriksaan angka acuan baseline:** rasio nasional TA2026 dari angka tampilan adalah `183,47 / 225,90 × 100 = 81,22%`; gap tampilan Rp42,43 M. Ini hanya mereproduksi hitungan dari angka yang telah dibulatkan SIKD, sehingga tidak memvalidasi nominal rupiah exact atau formula alokasi. Data 2026 adalah snapshot tahun berjalan, bukan angka final tahunan.
 
-## Sumber publik
+TA2025 menjadi periode historis/pembanding jika definisi, tingkat wilayah, dan snapshot dapat disejajarkan. Data per provinsi TA2025 tidak boleh dicampur dalam ringkasan baseline TA2026.
 
-1. **Portal Data SIKD DJPK, nasional 2024** — https://djpk.kemenkeu.go.id/portal/data/tkdd?pemda=--&provinsi=--&tahun=2024. Menampilkan DBH SDA Perikanan nasional: pagu Rp951,70 miliar, realisasi Rp944,29 miliar, 99,22%. Keterangan sumber menyebut data SIKD fitur Lacak Salur (CakLur). Snapshot halaman yang diperiksa bertanggal 19 Oktober 2026.
-2. **Portal Data SIKD DJPK, Kota Bandung 2024** — https://djpk.kemenkeu.go.id/portal/data/tkdd?pemda=17&provinsi=10&tahun=2024. Menampilkan pagu/realisasi DBH SDA Perikanan Rp1,07 miliar / Rp1,07 miliar (100%). Snapshot halaman yang diperiksa bertanggal 18 Oktober 2026.
-3. **Portal Data SIKD DJPK, Kab. Sumedang 2024** — https://djpk.kemenkeu.go.id/portal/data/tkdd?pemda=15&provinsi=10&tahun=2024. Menampilkan Rp1,10 miliar / Rp1,10 miliar (100%). Snapshot halaman yang diperiksa bertanggal 19 Oktober 2026.
-4. **Portal Data SIKD DJPK, Kab. Bandung Barat 2024** — https://djpk.kemenkeu.go.id/portal/data/tkdd?pemda=26&provinsi=10&tahun=2024. Menampilkan Rp1,07 miliar / Rp1,07 miliar (100%). Snapshot halaman yang diperiksa bertanggal 18 Oktober 2026.
-5. **PPID Pemprov Jawa Barat, daftar informasi berkala** — https://ppid.jabarprov.go.id/pages/info-berkala. Daftar tersebut memuat LRA Pemprov Jabar TA 2024, CaLK 2024, serta dokumen anggaran. Gunakan untuk menelusuri nominal tingkat provinsi; daftar dokumen saja belum menjadi bukti nominal DBH SDA Perikanan.
-6. **LKPD Pemprov Jawa Barat TA 2024 audited (CaLK)** — https://file.jabarprov.go.id/live/media/docs/archives/1749801566-25.-Informasi-CaLK-Pemerintah-Daerah-tahun-2024.pdf. Ringkasan mencatat pendapatan transfer dan pendapatan DBH SDA agregat. Nilai akun Perikanan dan kesesuaiannya dengan definisi data SIKD masih harus dikonfirmasi dari tabel rinci.
-7. **LKPD Kab. Sumedang TA 2024 audited** — https://fliphtml5.com/szrpa/cfue/. Salinan publik yang ditemukan menampilkan DBH SDA Perikanan anggaran/realisasi 2024 Rp1.097.155.000 dan realisasi 2023 Rp1.444.887.211. Cari/arsipkan salinan resmi PPID/BKAD sebelum menyebut tautan salinan ini sebagai sumber primer acceptance.
-8. **Peraturan Bupati Bandung No. 247 Tahun 2024, JDIH Kabupaten Bandung** — https://jdih.bandungkab.go.id/asset/file_hukum/No_247_Tahun_2024__677b940ae0d803.06129408.pdf. Tabel perubahan/penjabaran anggaran menampilkan DBH SDA Perikanan Rp833.805.000. Ini adalah data dokumen anggaran, bukan realisasi audited.
-9. **PMK 67 Tahun 2024, JDIH Kementerian Keuangan** — https://jdih.kemenkeu.go.id/dok/pmk-67-tahun-2024. Peraturan tersebut mengatur pengelolaan DBH dan DAU pada periodenya, tetapi halaman JDIH mencatat telah dicabut oleh PMK 35 Tahun 2026 pada 25 Mei 2026. Untuk interpretasi TA 2024, catat aturan yang berlaku pada tanggal dan proses terkait; jangan memakai PMK 35/2026 secara retroaktif sebagai mesin hitung TA 2024 tanpa tinjauan kebijakan.
-10. **Materi KLC DJPK: Kebijakan Dana Bagi Hasil Sumber Daya Alam** — https://klc2.kemenkeu.go.id/kms/knowledge/kebijakan-dana-bagi-hasil-sumber-daya-alam-0a2d89ef/detail/. Materi publik terbit 20 Mei 2025. Gunakan sebagai bahan orientasi; halaman tidak menyediakan transkrip yang dapat diperiksa, sehingga klaim operasional harus dilacak ke regulasi/data primer.
+## Sumber publik dan kegunaannya
 
-## Ketersediaan, granularitas, dan pembaruan
+1. **SIKD DJPK, nasional TA 2026** — [Portal data TKD](https://djpk.kemenkeu.go.id/portal/data/tkdd?provinsi=--&tahun=2026). Snapshot 22 Oktober 2026 menampilkan pagu DBH SDA Perikanan 225,90 M, realisasi 183,47 M, dan rasio 81,22%; TA2026 masih berjalan.
+2. **SIKD DJPK, nasional TA 2025 (historis)** — [Portal data TKD](https://djpk.kemenkeu.go.id/portal/data/tkdd?provinsi=--&tahun=2025). Snapshot 21 Oktober 2026 menampilkan pagu dan realisasi 714,66 M.
+3. **SIKD DJPK, agregat Kepri dan Riau TA2025 (historis)** — [Kepri](https://djpk.kemenkeu.go.id/portal/data/tkdd?provinsi=31&tahun=2025) dan [Riau](https://djpk.kemenkeu.go.id/portal/data/tkdd?pemda=--&provinsi=04&tahun=2025). Contoh historis dengan snapshot berbeda, bukan baseline 2026.
+4. **PP 37/2023** — [Dokumen BPK](https://peraturan.bpk.go.id/Download/313156/PP%20Nomor%2037%20Tahun%202023.pdf). Kerangka pengelolaan transfer ke daerah; penerapan untuk proses 2026 perlu dipasangkan dengan aturan pelaksanaan yang berlaku.
+5. **PMK 35/2026** — [JDIH Kementerian Keuangan](https://jdih.kemenkeu.go.id/dok/pmk-35-tahun-2026). Rujukan pengelolaan DBH/DAU yang harus diperiksa pasal, ketentuan berlaku, dan transisinya untuk proses yang dimodelkan.
+6. **Perpres 201/2024 dan KMK 29/2025** — rincian/penyesuaian TA2025, dipakai sebagai sumber historis bila diperlukan, bukan pagu baseline TA2026.
+7. **Materi KLC DJPK: Kebijakan DBH SDA** — [Halaman KLC](https://klc2.kemenkeu.go.id/kms/knowledge/kebijakan-dana-bagi-hasil-sumber-daya-alam-0a2d89ef/detail/). Bahan orientasi; klaim operasional tetap harus dilacak ke regulasi primer dan dataset.
 
-- SIKD menyediakan tampilan agregat nasional serta filter wilayah/subwilayah. Granularitas yang terlihat pada halaman adalah tahunan dan per akun/wilayah, bukan seri penyaluran bulanan pada detail hasil yang dibaca.
-- Keterangan halaman memakai snapshot CakLur dengan tanggal berbeda per halaman (18–19 Oktober 2026). Angka historis dapat berubah ketika data diperbarui atau direkonsiliasi; simpan tanggal akses dan versi snapshot.
-- Antarmuka publik yang diperiksa tidak membuktikan adanya API atau ekspor machine-readable. Jangan membangun integrasi API sebelum endpoint/izin/format diverifikasi. Vertical slice boleh menggunakan fixture CSV yang disalin dan diberi sumber, waktu ekstraksi, serta status pembulatan.
-- LKPD/DPA/Perda daerah biasanya berupa dokumen tahunan, sementara SIKD menyajikan postur penyaluran. Angka antarjenis dokumen dapat berbeda karena basis, versi anggaran, tanggal snapshot, serta definisi anggaran/realisasi. Jangan gabungkan sebelum direkonsiliasi.
+## Ketersediaan dan batas data
+
+- Baseline TA2026 saat ini berisi snapshot nasional per 22 Oktober 2026. Data 38 agregat `Se-Prov` TA2026 belum diverifikasi/dimasukkan.
+- Data TA2025 yang tersimpan adalah historis; jangan gabungkan dengan angka TA2026. Jika dipakai untuk tren, samakan level wilayah dan definisi.
+- Jangan menjumlahkan angka nasional dengan agregat provinsi atau kabupaten/kota karena tingkatnya tumpang tindih.
+- SIKD yang diperiksa menyajikan postur tahunan pagu/realisasi; bukti ini tidak cukup untuk mengeluarkan sinyal keterlambatan penyaluran sepanjang tahun.
+- Antarmuka yang diperiksa belum membuktikan API atau ekspor machine-readable. Gunakan fixture berprovenance sampai cara ekspor dan izin pemakaian diverifikasi.
+- Untuk menghitung ulang alokasi perlu data tingkat penerima kabupaten/kota secara nasional, basis penerimaan/PNBP, luas laut, indikator kinerja yang memang dipersyaratkan, aturan tahun/proses terkait, serta contoh perhitungan yang dapat direproduksi. Agregat `Se-Prov` tidak memadai.
+- BPS/KKP dan dokumen PPID daerah berguna untuk konteks atau rekonsiliasi, tetapi definisi, periode, dan basis harus cocok sebelum digabungkan.
 
 ## Daftar verifikasi terbuka
 
 | ID | Pertanyaan | Status | Dampak |
 |---|---|---|---|
-| SRC-01 | Berapa nominal DBH SDA Perikanan TA 2024 untuk entitas Provinsi Jawa Barat sendiri, dan apakah tercatat sebagai penerima pada sumber yang sama? | Belum terverifikasi | Jangan render sebagai nol; tampilkan `belum terverifikasi` sampai data resmi cocok. |
-| SRC-02 | Dapatkah SIKD menyediakan nominal mentah, file ekspor, atau bukti penyaluran per periode? | Belum terverifikasi | Perbandingan hanya pada presisi tampilan tahunan; jangan klaim peringatan keterlambatan berkala. |
-| SRC-03 | Apakah angka SIKD untuk Sumedang, Bandung, dan Bandung Barat cocok dengan LKPD audited/dokumen anggaran TA 2024 pada basis yang sama? | Perlu rekonsiliasi | Catat selisih dan beda definisi; SIKD menjadi fixture demonstrasi, bukan otomatis angka audit. |
-| SRC-04 | Dokumen/regulasi mana yang menetapkan pembagian penerimaan DBH Perikanan yang relevan untuk TA 2024? | Tinjauan kebijakan | Tanpa sumber tersebut engine tidak menghitung ulang formula alokasi. |
-| SRC-05 | Bagaimana tanggal pembaruan SIKD dan kebijakan koreksi historis bekerja? | Belum terverifikasi | Semua fixture wajib menyimpan `source_as_of` dan `retrieved_at`. |
+| SRC-01 | Dapatkah seluruh 38 agregat `Se-Prov` TA2026 diekstrak pada tanggal snapshot yang sama? | Belum dilakukan; baru nasional tersedia pada baseline | Blocker perbandingan lintas provinsi yang konsisten. |
+| SRC-02 | Apakah portal menyediakan nominal mentah, ekspor, atau bukti penyaluran per periode? | Belum terverifikasi | Tanpa itu, hasil hanya pada presisi tampilan tahunan. |
+| SRC-03 | Apa pagu dan perubahan resmi TA2026, dan bagaimana rekonsiliasinya dengan SIKD? | Perlu ekstraksi sumber APBN/penyesuaian TA2026 | Jangan gunakan pagu historis 2025 sebagai baseline berjalan. |
+| SRC-04 | Apa rincian data formula DBH Perikanan untuk seluruh penerima dan tahun/proses 2026? | Kerangka hukum ditemukan; aturan pelaksanaan, input, dan golden case TA2026 belum lengkap | Blocker untuk estimasi alokasi per daerah. |
+| SRC-05 | Bagaimana tanggal pembaruan SIKD dan koreksi historis bekerja? | Belum terverifikasi | Fixture wajib menyimpan `source_as_of` dan `retrieved_at`. |
+| SRC-06 | Apakah angka SIKD cocok dengan dokumen audited daerah pada basis dan versi yang sama? | Perlu rekonsiliasi terpilih | Catat selisih dan beda definisi; jangan menganggap angka dashboard sebagai audit. |
+| GOV-01 | Apakah Cetak Biru SIKD 2025–2029 pada diagram benar bernomor KEP-65/PK/2025? | Belum terverifikasi | Jangan jadikan klaim keselarasan sebagai fakta sebelum sumber primer diperoleh. |
 
-## Aturan pencatatan data sumber
+## Catatan substansi formula
 
-Setiap rekaman membawa URL sumber, judul/instansi, jenis dokumen, tahun anggaran, tanggal snapshot, tanggal pengambilan, satuan asli, nominal asli jika tersedia, angka yang ditampilkan, presisi, status verifikasi, dan catatan rekonsiliasi. `0`, `null`, `not_available`, dan `not_verified` memiliki makna terpisah.
+PP 37/2023 memberi kerangka pembagian DBH SDA Perikanan, termasuk komponen pembagian 60% merata dan 40% berdasar luas laut. Struktur pada diagram yang diberikan juga menunjukkan komponen alokasi 90% formula dan 10% kinerja. Untuk baseline 2026, verifikasi aturan operasional dan ketentuan transisi yang berlaku, daftar penerima, nilai input resmi, metode indikator, pembulatan, serta angka acuan TA2026. Jangan menerapkan aturan 2026 secara retroaktif pada observasi historis 2025 dan jangan menggunakan formula Minerba untuk Perikanan.
+
+Setiap rekaman sumber harus membawa URL, instansi, jenis dokumen, tahun, tingkat wilayah, tanggal snapshot, tanggal pengambilan, unit, angka persis seperti ditampilkan, presisi, status verifikasi, dan catatan rekonsiliasi. `0`, `NOT_AVAILABLE`, dan `NOT_VERIFIED` memiliki arti berbeda.
