@@ -1,29 +1,75 @@
-# EWS DBH SDA Perikanan
+# SIKD Cerdas HKPD — Simulator & EWS DBH SDA Perikanan
 
-Rancangan vertical slice untuk prototype Early Warning System (EWS) dan Decision Support System (DSS) DBH SDA Perikanan. Fokus awal: TA 2024, data publik DJPK/SIKD, engine deterministik, UI Streamlit, dan perbandingan baseline dengan asumsi skenario.
+Prototype simulator alokasi (DSS) dan Early Warning System (EWS) penyaluran DBH SDA Perikanan untuk DJPK
+Kemenkeu. Model awal memakai satu jenis TKD (DBH SDA Perikanan) dan dirancang agar bisa diperluas ke jenis TKD
+lain.
 
-**Status:** tahap dokumentasi rancangan. Belum ada engine atau UI runnable dan belum ada review ML/BA. Jangan menggunakan dokumen ini sebagai klaim bahwa Definition of Done card sudah terpenuhi.
+**Status:** tahap awal. Use case dan kebutuhan data sudah disusun; belum ada engine, pipeline, atau UI yang
+dapat dijalankan, dan belum ada review ML/BA. README ini bukan klaim bahwa Definition of Done sudah terpenuhi.
 
-## Mulai membaca
+## Sumber kebenaran
 
-1. [`docs/clickup-card.md`](docs/clickup-card.md) — scope, DoD, acceptance criteria, evidence.
-2. [`docs/research.md`](docs/research.md) — data contoh, sumber, kualitas dan pertanyaan verifikasi.
-3. [`docs/architecture.md`](docs/architecture.md) — desain komponen.
-4. [`docs/data-model.md`](docs/data-model.md) — skema observation, scenario, result, dan review.
-5. [`docs/risk-methodology.md`](docs/risk-methodology.md) — rumus dan batas interpretasi sinyal.
-6. [`docs/agent-workflow.md`](docs/agent-workflow.md) — alur UI dan review manusia.
-7. [`docs/roadmap.md`](docs/roadmap.md) — tahap implementasi.
+Use case, kebutuhan data, aturan EWS, log asumsi, dan acceptance criteria dikelola di Google Sheet:
+https://docs.google.com/spreadsheets/d/1Jq-YDB_jPE5kz40AsQTqY0xaK3vU6GDOJ0mOZ0pKyqU/edit
 
-## Data demonstrasi awal
+- **Kebutuhan Data Skenario 1** — scope MVP: data D1–D12, parameter simulator, aturan R1–R7, asumsi AS-01–AS-07.
+- **Pengembangan Engine, UI dan ske** — Definition of Done dan acceptance criteria AC-01–AC-04.
 
-Portal Data SIKD DJPK untuk TA 2024 menampilkan DBH SDA Perikanan nasional sebesar pagu Rp951,70 miliar dan realisasi Rp944,29 miliar (99,22%). Contoh wilayah Jawa Barat yang ditampilkan SIKD: Kota Bandung Rp1,07 miliar/Rp1,07 miliar; Kab. Sumedang Rp1,10 miliar/Rp1,10 miliar; Kab. Bandung Barat Rp1,07 miliar/Rp1,07 miliar. Angka daerah dibulatkan di tampilan portal. Nilai tingkat Provinsi Jawa Barat masih perlu diverifikasi; data kosong tidak diartikan nol.
+Panduan kerja (termasuk untuk Claude Code) ada di [`CLAUDE.md`](CLAUDE.md).
 
-Rincian sumber dan snapshot ada di [`docs/research.md`](docs/research.md). Data portal dapat diperbarui, maka angka di atas adalah contoh sumber, bukan fixture runtime.
+## Scope MVP — Skenario 1, TA 2026
 
-## Arsitektur dan batas
+**EWS penyaluran.** Apakah setiap kab/kota menerima DBH Perikanan 2026 sesuai pagu, pada waktunya, dan ke
+rekening RKUD yang benar? Jika tidak, apakah selisihnya wajar (kurang/lebih bayar sah, penundaan karena syarat
+salur belum dipenuhi) atau anomali (salah nominal, salah waktu, salah kirim)? Dijawab oleh tujuh aturan:
 
-Engine Python menghitung rasio, gap, dan perubahan skenario secara deterministik. UI MVP direncanakan memakai Streamlit. Setiap hasil perlu menampilkan sumber, waktu snapshot, satuan, presisi, formula versi, dan batasannya. Data tahunan tidak digunakan untuk menyimpulkan keterlambatan penyaluran. Formula alokasi Minerba dari materi diagram tidak diterapkan pada Perikanan.
+| Kode | Level | Kondisi |
+|---|---|---|
+| R1 | Merah | Total salur melebihi pagu |
+| R2 | Merah | Salah kirim (kode daerah / rekening tidak cocok) |
+| R3 | Oranye | Nominal tahap meleset padahal syarat salur lengkap |
+| R4 | Oranye | Tahap terlambat padahal syarat salur lengkap |
+| R5 | Kuning | Tahap tertunda karena daerah belum lapor |
+| R6 | Kuning | Target DBH di APBD berbeda dari pagu pusat |
+| R7 | Kuning | Dana sudah masuk tetapi serapan rendah (idle) |
 
-## Langkah kerja berikutnya
+Ambang setiap aturan masih asumsi awal dan perlu dikonfirmasi DJPK.
 
-Tutup verifikasi sumber untuk Provinsi Jawa Barat dan nominal daerah yang presisi, lalu implementasikan fixture data sebagai tahap pertama. Ikuti quality gate dan catat review manusia; jangan menganggap AI sebagai reviewer internal.
+**Simulator alokasi.** INPUT (PNBP T-1, daftar daerah penerima, luas wilayah laut, indikator kinerja, pagu
+historis) → PROSES (validasi kelengkapan, formula alokasi, simulasi perubahan parameter, rekonsiliasi terhadap
+pagu) → OUTPUT (estimasi alokasi per daerah, perbandingan skenario, selisih terhadap pagu, jejak perhitungan).
+Hasil simulator adalah bahan analisis, bukan penetapan alokasi final.
+
+## Data
+
+Belum ada data yang diambil. Sebagian data inti tidak tersedia di sumber publik (status syarat salur, posisi
+kas, PNBP T-1, luas wilayah laut, dan transaksi SP2D per rekening); aturan yang bergantung padanya akan
+dilaporkan sebagai "tidak dapat dievaluasi", bukan dianggap lolos.
+
+Tahap awal tidak memakai database. Data disimpan sebagai file di folder `data/`:
+
+```
+data/
+  raw/       file asli dari portal, disimpan apa adanya + metadata sumber (URL, tanggal akses)
+  ...        data tabular D1–D12 sebagai CSV; parameter, ambang, dan metadata sebagai JSON
+```
+
+Konvensi utama: nominal Rupiah sebagai bilangan bulat; sel kosong berarti **tidak tersedia**, `0` berarti
+**nilai nol**; data yang terlambat diperbarui ditandai lewat tanggal snapshot di metadata sumber.
+
+## Stack (rencana)
+
+- Python untuk pipeline data, validasi, rule engine, dan simulator deterministik.
+- Streamlit untuk dashboard MVP; FastAPI untuk backend.
+- LangGraph untuk AI agent setelah fondasi siap. LLM hanya membantu investigasi dan menjelaskan alert beserta
+  buktinya; status risiko ditentukan rule engine dan dapat ditinjau manusia.
+
+## Cara kerja
+
+Pengembangan berjalan satu tahap per waktu: kerjakan satu tahap, jelaskan alasan desain, jalankan pengujian,
+lalu review sebelum lanjut. Urutan fondasi: pipeline data → validasi data → rule engine & simulator → baseline
+statistik → AI agent.
+
+## Lisensi
+
+Lihat [`LICENSE`](LICENSE).
