@@ -8,7 +8,8 @@ src/
     fetch_raw.py      # unduh data mentah ke data/raw/ + source.json (CLI)
   tables/
     portal_tkdd.py    # baca snapshot Portal TKDD: pilih snapshot, parse ekspor, konversi nilai
-    d01.py            # load_d01(): D1 Pagu DBH SDA Perikanan per pemda → DataFrame
+    d01.py            # load_d01(): D1 Pagu DBH SDA Perikanan per pemda (snapshot terbaru) → DataFrame
+    d02.py            # load_d02(): D2 Realisasi kumulatif per pemda, satu baris per snapshot → DataFrame
   show_table.py       # registri tabel D1–D12 yang dipakai dashboard
 ```
 

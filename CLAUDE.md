@@ -60,6 +60,17 @@ Jangan perlakukan item "belum terverifikasi" sebagai fakta. Saat memakainya di k
 | Jadwal & porsi 7 tahap salur DBH SDA (PMK 35/2026 Ps. 82) | Dikutip dari pemberitaan, belum dicek ke teks PMK |
 | Ambang R3–R7 (5%, 7 hari, 14 hari, 10%, 50%) | Asumsi awal tim, perlu konfirmasi DJPK |
 
+## Peta sumber data
+
+| Data | Sumber | Status |
+|---|---|---|
+| D1 pagu per pemda | Portal TKDD DJPK (`portal/data/tkdd`, ekspor SpreadsheetML per pemda) | Terambil; dibulatkan 0,01 M; kode DJPK, bukan Kemendagri |
+| D1 pagu presisi | Perpres 118/2025 Lampiran V.8, hlm. PDF 1001–1017 (ribuan rupiah) | PDF scan, lapisan OCR bawaan rusak; belum diekstrak |
+| D2 realisasi | Portal TKDD — hanya kumulatif per pemda per snapshot | Terambil; SP2D/tanggal/tahap/rekening hanya di CakLur (SIKD NG) / OM-SPAN, wajib login → perlu akses resmi |
+| Historis audited DJPK (`?page_id=41626`) | Excel alokasi/realisasi 2014–2025 | Hanya "DBH SDA" gabungan, tidak memisahkan Perikanan → tidak dipakai |
+
+Temuan terbuka dan asumsi baru dicatat di log asumsi sheet (bagian 6), bukan di file ini.
+
 ## Ketersediaan data (penting)
 
 Bedakan dengan tegas tiga kondisi ini di skema, pipeline, dan UI — jangan pernah menyamakannya:
@@ -93,11 +104,37 @@ bukan diam-diam lolos.
 - FastAPI (backend), Streamlit (dashboard MVP).
 - Penyimpanan tahap awal: file di folder `data/` (belum memakai PostgreSQL). PostgreSQL/pgvector
   dipertimbangkan nanti bila kebutuhan multi-pengguna atau RAG muncul.
+  - Isi `data/` **tidak masuk git** (kecuali `data/README.md` dan `data/raw/.gitkeep`); setiap orang mengambil
+    snapshot sendiri lewat `src/ingest/fetch_raw.py`. Jangan mengunduh data mentah secara manual/ad hoc.
   - Data tabular (D1–D12) → **CSV**; parameter, ambang R1–R7, dan metadata sumber → **JSON**.
-  - File asli dari portal disimpan apa adanya di `data/raw/` beserta metadata sumber (URL, tanggal akses).
+  - File asli disimpan apa adanya di `data/raw/<sumber>/<YYYY-MM-DDTHHMMSS>/` beserta `source.json` (URL,
+    waktu akses, sha256). Nama folder memuat jam karena portal bisa berubah dalam hari yang sama.
   - CSV dibaca dengan skema eksplisit (dtype per kolom), tidak mengandalkan tebakan tipe pandas.
   - Nominal Rupiah disimpan sebagai bilangan bulat rupiah, bukan desimal/float.
   - Sel kosong = **tidak tersedia**; `0` = **nilai nol**. Saat membaca, matikan konversi NA default pandas
     selain sel kosong, dan jangan pernah mengisi kosong dengan 0. Kondisi "terlambat diperbarui" dicatat
     di metadata sumber (tanggal snapshot), bukan di sel data.
 - LangGraph untuk orkestrasi AI agent — setelah fondasi siap.
+
+## Perintah
+
+Selalu dari root repo, memakai `.venv`, dan dengan `-m` (bukan path file) agar paket `src` dikenali:
+
+```bash
+.venv/bin/python -m src.ingest.fetch_raw portal-tkdd --tahun 2026   # snapshot portal, ±10 menit
+.venv/bin/python -m src.ingest.fetch_raw perpres-118-2025           # PDF Perpres, ±21 MB
+.venv/bin/streamlit run app.py                                      # http://localhost:8501/data
+.venv/bin/python -m pytest
+```
+
+## Konvensi kode
+
+- Alur: `src/ingest/` mengambil file mentah → `src/tables/` membaca file mentah menjadi DataFrame per kelompok
+  data → `app.py` (Streamlit) menampilkannya.
+- Tabel baru: buat `src/tables/dNN.py` berisi `load_dNN()` yang mengembalikan DataFrame dengan dtype eksplisit
+  dan `df.attrs` (`tabel`, `judul`, `catatan`, info sumber), lalu daftarkan di `TABEL` pada `src/show_table.py`.
+- Jangan memasang `if __name__ == "__main__"` di `src/tables/` maupun `src/show_table.py`; hanya `src/ingest/`
+  yang dijalankan langsung dari terminal.
+- Entry point dashboard adalah `app.py` di root; URL `/data` diatur lewat `.streamlit/config.toml`.
+- Nama fungsi, variabel, dan kolom memakai Bahasa Indonesia, mengikuti nama field di sheet.
+- Tes tidak boleh mengakses jaringan; pakai fixture sintetis di `tests/`.

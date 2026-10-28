@@ -44,11 +44,13 @@ st.subheader(f"{meta['tabel']} — {meta['judul']}")
 st.warning(meta["catatan"])
 
 kiri, tengah, kanan = st.columns(3)
-kiri.metric("Jumlah pemda", len(df))
+kiri.metric("Jumlah pemda", df["Kode_Pemda_DJPK"].nunique())
 if "Total_Pagu_Rp" in df:
     # Jumlah dari angka yang sudah dibulatkan portal, bukan total resmi.
     miliar = f"{df['Total_Pagu_Rp'].sum() / 1e9:,.2f}".translate(str.maketrans(",.", ".,"))
     tengah.metric("Jumlah pagu (dari angka portal)", f"Rp{miliar} M")
+elif "jumlah_snapshot" in meta:
+    tengah.metric("Jumlah snapshot", meta["jumlah_snapshot"])
 kanan.metric("Pemda tanpa baris akun", meta.get("pemda_tanpa_akun", "-"))
 
 with st.expander("Sumber data"):

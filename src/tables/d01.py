@@ -39,17 +39,12 @@ def load_d01(snapshot: Path | None = None) -> pd.DataFrame:
 
     baris = []
     tanpa_akun = []
-    for kode_prov, kode_pemda, nama in portal_tkdd.daftar_pemda(snapshot):
-        relpath = f"tkdd/prov-{kode_prov}_pemda-{kode_pemda}.xml"
-        path = snapshot / relpath
-        if not path.exists():
-            raise FileNotFoundError(f"Ekspor untuk {nama} tidak ada di snapshot: {relpath}")
-        akun = portal_tkdd.cari_akun(path, AKUN)
+    for kode, nama, relpath, akun in portal_tkdd.akun_per_pemda(snapshot, AKUN):
         if akun is None:
             tanpa_akun.append(nama)
             continue
         baris.append({
-            "Kode_Pemda_DJPK": f"{kode_prov}.{kode_pemda}",
+            "Kode_Pemda_DJPK": kode,
             "Nama_Pemda": nama,
             "Tahun": tahun,
             "Pagu_PHP_Rp": pd.NA,
