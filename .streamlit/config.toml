@@ -1,0 +1,3 @@
+[server]
+# Dashboard dilayani di http://localhost:8501/data
+baseUrlPath = "data"

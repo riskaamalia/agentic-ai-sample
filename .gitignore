@@ -218,3 +218,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Data proyek: semua isi data/ tidak masuk git, kecuali dokumentasi dan penanda folder.
+# Snapshot dibuat ulang dengan: python -m src.ingest.fetch_raw <sumber>
+data/*
+!data/README.md
+!data/raw/
+data/raw/*
+!data/raw/.gitkeep

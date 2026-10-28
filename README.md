@@ -4,8 +4,27 @@ Prototype simulator alokasi (DSS) dan Early Warning System (EWS) penyaluran DBH 
 Kemenkeu. Model awal memakai satu jenis TKD (DBH SDA Perikanan) dan dirancang agar bisa diperluas ke jenis TKD
 lain.
 
-**Status:** tahap awal. Use case dan kebutuhan data sudah disusun; belum ada engine, pipeline, atau UI yang
-dapat dijalankan, dan belum ada review ML/BA. README ini bukan klaim bahwa Definition of Done sudah terpenuhi.
+**Status:** tahap awal. Sudah ada: script pengambil data mentah (Portal TKDD DJPK dan PDF Perpres 118/2025)
+dan dashboard Streamlit yang menampilkan D1 (pagu DBH SDA Perikanan per pemda, dari portal). Belum ada rule
+engine EWS, simulator, maupun review ML/BA. README ini bukan klaim bahwa Definition of Done sudah terpenuhi.
+
+## Menjalankan
+
+Semua perintah dari root repo, memakai Python 3.12 di `.venv`:
+
+```bash
+python3 -m venv .venv                      # sekali saja, bila .venv belum ada
+.venv/bin/pip install pandas requests streamlit pytest   # dependensi (lihat pyproject.toml)
+
+.venv/bin/python -m src.ingest.fetch_raw portal-tkdd --tahun 2026   # snapshot portal (±10 menit)
+.venv/bin/python -m src.ingest.fetch_raw perpres-118-2025           # PDF Perpres (±21 MB)
+
+.venv/bin/streamlit run app.py             # dashboard di http://localhost:8501/data
+.venv/bin/python -m pytest                 # pengujian
+```
+
+Dashboard membaca snapshot lengkap terbaru di `data/raw/`; jalankan `fetch_raw` dulu bila folder itu masih
+kosong. Struktur kode dijelaskan di [`src/README.md`](src/README.md).
 
 ## Sumber kebenaran
 
@@ -42,25 +61,34 @@ Hasil simulator adalah bahan analisis, bukan penetapan alokasi final.
 
 ## Data
 
-Belum ada data yang diambil. Sebagian data inti tidak tersedia di sumber publik (status syarat salur, posisi
-kas, PNBP T-1, luas wilayah laut, dan transaksi SP2D per rekening); aturan yang bergantung padanya akan
-dilaporkan sebagai "tidak dapat dievaluasi", bukan dianggap lolos.
+Sumber yang sudah diambil:
 
-Tahap awal tidak memakai database. Data disimpan sebagai file di folder `data/`:
+| Sumber | Dipakai untuk | Keterbatasan |
+|---|---|---|
+| Portal Data SIKD DJPK — TKDD | D1 (pagu), D2 (realisasi kumulatif) per pemda | Nilai dibulatkan 0,01 miliar; kode DJPK, bukan Kemendagri; tanpa rincian tahap/SP2D/rekening |
+| Perpres 118/2025 Lampiran V.8 | Pagu presisi per pemda (ribuan rupiah) | PDF hasil scan; tabel belum diekstrak |
+
+Sebagian data inti tidak tersedia di sumber publik (status syarat salur, posisi kas, PNBP T-1, luas wilayah
+laut, dan transaksi SP2D per rekening); aturan yang bergantung padanya akan dilaporkan sebagai "tidak dapat
+dievaluasi", bukan dianggap lolos.
+
+Tahap awal tidak memakai database. Data disimpan sebagai file di folder `data/` dan **tidak masuk git**;
+setiap anggota tim mengambil snapshot sendiri dengan script di atas. Detail konvensi ada di
+[`data/README.md`](data/README.md).
 
 ```
 data/
-  raw/       file asli dari portal, disimpan apa adanya + metadata sumber (URL, tanggal akses)
+  raw/       file asli dari sumber, disimpan apa adanya + source.json (URL, waktu akses, sha256)
   ...        data tabular D1–D12 sebagai CSV; parameter, ambang, dan metadata sebagai JSON
 ```
 
 Konvensi utama: nominal Rupiah sebagai bilangan bulat; sel kosong berarti **tidak tersedia**, `0` berarti
 **nilai nol**; data yang terlambat diperbarui ditandai lewat tanggal snapshot di metadata sumber.
 
-## Stack (rencana)
+## Stack
 
 - Python untuk pipeline data, validasi, rule engine, dan simulator deterministik.
-- Streamlit untuk dashboard MVP; FastAPI untuk backend.
+- Streamlit untuk dashboard MVP (sudah dipakai); FastAPI untuk backend (rencana).
 - LangGraph untuk AI agent setelah fondasi siap. LLM hanya membantu investigasi dan menjelaskan alert beserta
   buktinya; status risiko ditentukan rule engine dan dapat ditinjau manusia.
 

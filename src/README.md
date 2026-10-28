@@ -1,22 +1,20 @@
-# Source Code Area
+# src/
 
-Status: **belum ada kode aplikasi**. Folder ini saat ini hanya menyimpan dokumen kontrak awal agar implementasi tetap bertahap dan mudah direview.
-
-## Rencana modul pertama
+Kode Python proyek. Jalankan semua perintah dari root repo; entry point dashboard ada di `../app.py`.
 
 ```text
 src/
-  app.py                    # entry point Streamlit
-  engine/
-    calculations.py         # rasio, gap, delta scenario; pure functions
-    validation.py           # validasi nilai/status/provenance
-  data/
-    observations.csv        # fixture DBH Perikanan berversi
-    loader.py               # parsing tanpa kehilangan metadata
-  ui/
-    components.py           # tampilan hasil/source/scenario bila dibutuhkan
+  ingest/
+    fetch_raw.py      # unduh data mentah ke data/raw/ + source.json (CLI)
+  tables/
+    portal_tkdd.py    # baca snapshot Portal TKDD: pilih snapshot, parse ekspor, konversi nilai
+    d01.py            # load_d01(): D1 Pagu DBH SDA Perikanan per pemda → DataFrame
+  show_table.py       # registri tabel D1–D12 yang dipakai dashboard
 ```
 
-Mulai dengan fixture dan engine saja. Tambahkan satu tahap pada satu waktu. Jangan buat folder/file Python di sini sebelum definisi dan ruang lingkup tahap implementasinya siap direview.
+Alur data: `ingest` mengambil file mentah apa adanya → `tables` membaca file mentah menjadi DataFrame per
+kelompok data (D1, D2, …) → `app.py` menampilkannya.
 
-Kontrak desain ada di `../docs/architecture.md`, `../docs/data-model.md`, dan `../docs/risk-methodology.md`.
+Menambah tabel baru: buat `tables/dNN.py` dengan fungsi `load_dNN()` yang mengembalikan DataFrame (dengan
+`df.attrs` berisi `tabel`, `judul`, `catatan`, dan info sumber), lalu daftarkan di `TABEL` pada
+`show_table.py`.
